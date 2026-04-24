@@ -106,8 +106,9 @@ export default function PatientPortal() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      if (ev.target && ev.target.result) {
-        setProfileForm((prev) => ({ ...prev, [field]: ev.target!.result as string }));
+      const result = ev.target?.result;
+      if (typeof result === 'string') {
+        setProfileForm((prev) => ({ ...prev, [field]: result }));
       }
     };
     reader.readAsDataURL(file);
