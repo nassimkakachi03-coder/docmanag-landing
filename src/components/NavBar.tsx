@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { Activity, LogIn, Menu, ShieldCheck, UserCircle, X } from 'lucide-react';
 
 export default function NavBar() {
   const location = useLocation();
-  const navigate = useNavigate();
   const [patientUser, setPatientUser] = useState<any>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 

@@ -1,18 +1,11 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router';
 import {
-  ArrowRight,
   CalendarDays,
   CheckCircle2,
-  Mail,
-  Phone,
   ShieldCheck,
   Sparkles,
-  User,
 } from 'lucide-react';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 export default function Home() {
 

@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router';
 import {
-  CalendarDays, CheckCircle2, CreditCard, ExternalLink, FileText,
-  Image as ImageIcon, Link2, LogOut, Plus, ShieldCheck, UserRound, X,
+  CalendarDays, CreditCard, ExternalLink, FileText,
+  Image as ImageIcon, LogOut, Plus, ShieldCheck, UserRound, X,
 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
@@ -106,8 +106,8 @@ export default function PatientPortal() {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      if (ev.target?.result) {
-        setProfileForm((prev) => ({ ...prev, [field]: ev.target.result as string }));
+      if (ev.target && ev.target.result) {
+        setProfileForm((prev) => ({ ...prev, [field]: ev.target!.result as string }));
       }
     };
     reader.readAsDataURL(file);

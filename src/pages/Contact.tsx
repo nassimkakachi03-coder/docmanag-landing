@@ -16,13 +16,11 @@ export default function Contact() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  const [token, setToken] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const t = localStorage.getItem('patient_token');
     if (t) {
-      setToken(t);
       setIsLoggedIn(true);
       // Fetch user data to pre-fill
       axios.get(`${API_URL}/patient-auth/me`, { headers: { Authorization: `Bearer ${t}` } })
