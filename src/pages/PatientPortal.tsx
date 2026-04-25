@@ -327,7 +327,6 @@ export default function PatientPortal() {
                 <p><span className="font-bold text-slate-900">Nom:</span> {patient?.firstName} {patient?.lastName}</p>
                 <p><span className="font-bold text-slate-900">Téléphone:</span> {patient?.phone || account?.phone || 'Non renseigné'}</p>
                 <p><span className="font-bold text-slate-900">Email:</span> {patient?.email || account?.email || 'Non renseigné'}</p>
-                <p><span className="font-bold text-slate-900">Adresse:</span> {patient?.address || 'Non renseignée'}</p>
                 <p><span className="font-bold text-slate-900">Compte créé le:</span> {account?.createdAt ? new Date(account.createdAt).toLocaleDateString('fr-FR') : 'Non disponible'}</p>
               </div>
             </section>
