@@ -61,7 +61,7 @@ export default function PatientPortal() {
 
   useEffect(() => {
     const load = async () => {
-      if (!token) { setError('Veuillez vous connecter.'); setLoading(false); return; }
+      if (!token) { navigate('/login'); setLoading(false); return; }
       try {
         const r = await axios.get(`${API_URL}/patient-auth/me/history`, { headers });
         setData(r.data);
@@ -73,7 +73,13 @@ export default function PatientPortal() {
           });
         }
       } catch (err: any) {
-        setError(err.response?.data?.message || 'Impossible de charger votre historique.');
+        if (err.response?.status === 401) {
+          localStorage.removeItem('patient_token');
+          localStorage.removeItem('patient_user');
+          navigate('/login');
+        } else {
+          setError(err.response?.data?.message || 'Impossible de charger votre historique.');
+        }
       } finally { setLoading(false); }
     };
     void load();
