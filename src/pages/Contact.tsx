@@ -4,6 +4,18 @@ import { CheckCircle2, Mail, MessageSquare, Phone, User } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+const MOTIFS = [
+  'Douleur dentaire',
+  'Problème de gencives',
+  'Détartrage',
+  'Caries',
+  'Sensibilités dentaires',
+  'Orthodontie',
+  'Contrôle / Prévention',
+  'Mauvaise haleine',
+  'Autres',
+];
+
 export default function Contact() {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -17,6 +29,7 @@ export default function Contact() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [otherSubject, setOtherSubject] = useState('');
 
   useEffect(() => {
     const t = localStorage.getItem('patient_token');
@@ -45,18 +58,13 @@ export default function Contact() {
     event.preventDefault();
     setLoading(true);
     setError('');
-
+    const finalSubject = formData.subject === 'Autres' ? otherSubject.trim() : formData.subject;
+    if (!finalSubject) { setError('Veuillez préciser le motif.'); setLoading(false); return; }
     try {
-      await axios.post(`${API_URL}/contact`, formData);
+      await axios.post(`${API_URL}/contact`, { ...formData, subject: finalSubject });
       setSuccess(true);
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: '',
-      });
+      setFormData({ firstName: '', lastName: '', email: '', phone: '', subject: '', message: '' });
+      setOtherSubject('');
     } catch (err: any) {
       setError(err.response?.data?.message || "Une erreur est survenue lors de l'envoi du message.");
     } finally {
@@ -156,19 +164,34 @@ export default function Contact() {
               )}
 
               <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-700">Objet *</label>
+                <label className="text-sm font-semibold text-slate-700">Motif *</label>
                 <div className="relative">
                   <MessageSquare className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <input
+                  <select
                     required
                     name="subject"
                     value={formData.subject}
-                    onChange={handleChange}
-                    placeholder="Ex: Question sur un soin ou un rendez-vous"
+                    onChange={(e) => setFormData(c => ({ ...c, subject: e.target.value }))}
                     className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
-                  />
+                  >
+                    <option value="">Sélectionner un motif...</option>
+                    {MOTIFS.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
                 </div>
               </div>
+              {formData.subject === 'Autres' && (
+                <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-slate-700">Précisez votre motif *</label>
+                  <textarea
+                    required
+                    rows={2}
+                    value={otherSubject}
+                    onChange={(e) => setOtherSubject(e.target.value)}
+                    placeholder="Décrivez votre demande..."
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
+                  />
+                </div>
+              )}
 
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-slate-700">Message *</label>

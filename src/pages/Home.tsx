@@ -74,7 +74,7 @@ export default function Home() {
               <div className="mt-8 flex flex-col gap-3 w-full sm:flex-row sm:justify-center">
                 {token ? (
                   <Link
-                    to="/portal"
+                    to="/espace-patient"
                     className="rounded-full bg-teal-600 px-6 py-3 text-sm font-bold text-white transition hover:bg-teal-700 w-full sm:w-auto"
                   >
                     Accéder à mon espace patient

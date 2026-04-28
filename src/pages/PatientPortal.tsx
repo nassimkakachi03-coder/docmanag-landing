@@ -8,8 +8,27 @@ import {
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+const MOTIFS = [
+  'Douleur dentaire',
+  'Problème de gencives',
+  'Détartrage',
+  'Caries',
+  'Sensibilités dentaires',
+  'Orthodontie',
+  'Contrôle / Prévention',
+  'Mauvaise haleine',
+  'Autres',
+];
+
 const statusLabel = (s?: string) => {
-  const map: Record<string, string> = { Scheduled: 'Planifié', Completed: 'Terminé', Cancelled: 'Annulé', Pending: 'En attente', Paid: 'Payée', Overdue: 'En retard' };
+  const map: Record<string, string> = {
+    EnCours: 'En cours',
+    Termine: 'Terminé',
+    // legacy
+    Scheduled: 'En cours', Pending: 'En cours',
+    Completed: 'Terminé', Cancelled: 'Annulé',
+    Paid: 'Payée', Overdue: 'En retard',
+  };
   return map[s || ''] || s || 'Non renseigné';
 };
 const timelineLabel = (t: string) => {
@@ -27,6 +46,7 @@ export default function PatientPortal() {
   // Appointment booking
   const [showRdv, setShowRdv] = useState(false);
   const [rdvForm, setRdvForm] = useState({ date: '', reason: '', notes: '' });
+  const [rdvOtherReason, setRdvOtherReason] = useState('');
   const [rdvLoading, setRdvLoading] = useState(false);
   const [rdvMsg, setRdvMsg] = useState('');
   const [rdvError, setRdvError] = useState('');
@@ -77,10 +97,12 @@ export default function PatientPortal() {
 
   const handleRdv = async (e: React.FormEvent) => {
     e.preventDefault(); setRdvLoading(true); setRdvError(''); setRdvMsg('');
+    const finalReason = rdvForm.reason === 'Autres' ? rdvOtherReason.trim() : rdvForm.reason;
+    if (!finalReason) { setRdvError('Veuillez préciser le motif.'); setRdvLoading(false); return; }
     try {
-      await axios.post(`${API_URL}/patient-auth/appointment`, rdvForm, { headers });
+      await axios.post(`${API_URL}/patient-auth/appointment`, { ...rdvForm, reason: finalReason }, { headers });
       setRdvMsg('Rendez-vous créé ! Le cabinet vous contactera pour confirmer.');
-      setRdvForm({ date: '', reason: '', notes: '' });
+      setRdvForm({ date: '', reason: '', notes: '' }); setRdvOtherReason('');
       setTimeout(() => { setShowRdv(false); setRdvMsg(''); }, 2500);
     } catch (err: any) {
       setRdvError(err.response?.data?.message || 'Erreur lors de la création du rendez-vous.');
@@ -186,9 +208,19 @@ export default function PatientPortal() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-slate-700">Motif *</label>
-                  <input required value={rdvForm.reason} onChange={(e) => setRdvForm({ ...rdvForm, reason: e.target.value })} placeholder="Ex: Contrôle, détartrage, douleur..."
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10" />
+                  <select required value={rdvForm.reason} onChange={(e) => setRdvForm({ ...rdvForm, reason: e.target.value })}
+                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10">
+                    <option value="">Sélectionner un motif...</option>
+                    {MOTIFS.map(m => <option key={m} value={m}>{m}</option>)}
+                  </select>
                 </div>
+                {rdvForm.reason === 'Autres' && (
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-semibold text-slate-700">Précisez votre motif *</label>
+                    <textarea required rows={2} value={rdvOtherReason} onChange={(e) => setRdvOtherReason(e.target.value)} placeholder="Décrivez votre problème..."
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10" />
+                  </div>
+                )}
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-slate-700">Notes (optionnel)</label>
                   <textarea rows={3} value={rdvForm.notes} onChange={(e) => setRdvForm({ ...rdvForm, notes: e.target.value })} placeholder="Précisions..."

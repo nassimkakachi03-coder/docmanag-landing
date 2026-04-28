@@ -74,8 +74,8 @@ export default function Register() {
   }
 
   return (
-    <div className="bg-[linear-gradient(180deg,#f8fafc_0%,#eef6f5_48%,#ffffff_100%)] px-4 py-12">
-      <div className="mx-auto grid max-w-6xl overflow-hidden rounded-[34px] border border-slate-200 bg-white shadow-2xl lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)]">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef6f5_48%,#ffffff_100%)] flex items-center justify-center px-4 py-8">
+      <div className="w-full mx-auto grid max-w-6xl overflow-hidden rounded-[34px] border border-slate-200 bg-white shadow-2xl lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)]">
         <section className="hidden bg-gradient-to-br from-slate-950 via-slate-900 to-teal-900 p-10 text-white lg:block">
           <p className="text-xs font-black uppercase tracking-[0.3em] text-teal-200">Compte patient</p>
           <h1 className="mt-4 text-4xl font-black tracking-tight">Gardez vos informations de santé liées à votre email et à votre mot de passe.</h1>
