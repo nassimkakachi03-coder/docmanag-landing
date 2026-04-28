@@ -1,20 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { CheckCircle2, Mail, MessageSquare, Phone, User } from 'lucide-react';
+import { CheckCircle2, ShieldCheck } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
-const MOTIFS = [
-  'Douleur dentaire',
-  'Problème de gencives',
-  'Détartrage',
-  'Caries',
-  'Sensibilités dentaires',
-  'Orthodontie',
-  'Contrôle / Prévention',
-  'Mauvaise haleine',
-  'Autres',
-];
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -29,7 +17,6 @@ export default function Contact() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [otherSubject, setOtherSubject] = useState('');
 
   useEffect(() => {
     const t = localStorage.getItem('patient_token');
@@ -58,13 +45,11 @@ export default function Contact() {
     event.preventDefault();
     setLoading(true);
     setError('');
-    const finalSubject = formData.subject === 'Autres' ? otherSubject.trim() : formData.subject;
-    if (!finalSubject) { setError('Veuillez préciser le motif.'); setLoading(false); return; }
+    const finalSubject = 'Message depuis le site';
     try {
       await axios.post(`${API_URL}/contact`, { ...formData, subject: finalSubject });
       setSuccess(true);
-      setFormData({ firstName: '', lastName: '', email: '', phone: '', subject: '', message: '' });
-      setOtherSubject('');
+      setFormData(prev => ({ ...prev, message: '', subject: '' }));
     } catch (err: any) {
       setError(err.response?.data?.message || "Une erreur est survenue lors de l'envoi du message.");
     } finally {
@@ -104,115 +89,55 @@ export default function Contact() {
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               {error && <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</div>}
 
-              {!isLoggedIn && (
+              {!isLoggedIn ? (
+                <div className="flex flex-col items-center justify-center rounded-3xl bg-slate-50 p-8 text-center border-2 border-dashed border-slate-200">
+                  <div className="rounded-full bg-white p-4 shadow-sm mb-4">
+                    <ShieldCheck className="h-8 w-8 text-slate-400" />
+                  </div>
+                  <h3 className="text-lg font-black text-slate-900">Connexion requise</h3>
+                  <p className="mt-2 text-sm text-slate-600 max-w-xs mx-auto">
+                    Pour nous envoyer un message, vous devez être connecté à votre espace patient.
+                  </p>
+                  <a
+                    href="/login"
+                    className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800"
+                  >
+                    Se connecter
+                  </a>
+                </div>
+              ) : (
                 <>
-                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
-                    {[
-                      { label: 'Prénom *', name: 'firstName', placeholder: 'Ex: Meriem' },
-                      { label: 'Nom *', name: 'lastName', placeholder: 'Ex: Haddad' },
-                    ].map(({ label, name, placeholder }) => (
-                      <div key={name} className="space-y-1.5">
-                        <label className="text-sm font-semibold text-slate-700">{label}</label>
-                        <div className="relative">
-                          <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                          <input
-                            required
-                            name={name}
-                            value={(formData as any)[name]}
-                            onChange={handleChange}
-                            placeholder={placeholder}
-                            className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
-                          />
-                        </div>
-                      </div>
-                    ))}
+                  <div className="rounded-2xl bg-teal-50/50 p-4 border border-teal-100/50 mb-6">
+                    <p className="text-xs font-bold text-teal-700 flex items-center gap-2">
+                      <div className="h-1.5 w-1.5 rounded-full bg-teal-500 animate-pulse" />
+                      Connecté en tant que {formData.firstName} {formData.lastName}
+                    </p>
                   </div>
 
-                  <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+                  <div className="space-y-4 sm:space-y-5">
                     <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-slate-700">Email *</label>
-                      <div className="relative">
-                        <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                        <input
-                          required
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="patient@email.com"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
-                        />
-                      </div>
+                      <label className="text-sm font-semibold text-slate-700">Message *</label>
+                      <textarea
+                        required
+                        name="message"
+                        rows={5}
+                        value={formData.message}
+                        onChange={handleChange}
+                        placeholder="Expliquez votre besoin ou votre question..."
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
+                      />
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-semibold text-slate-700">Téléphone</label>
-                      <div className="relative">
-                        <Phone className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="0550 00 00 00"
-                          className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
-                        />
-                      </div>
-                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-full rounded-2xl bg-slate-900 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-slate-800 disabled:opacity-60"
+                    >
+                      {loading ? 'Envoi en cours...' : 'Envoyer le message'}
+                    </button>
                   </div>
                 </>
               )}
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-700">Motif *</label>
-                <div className="relative">
-                  <MessageSquare className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                  <select
-                    required
-                    name="subject"
-                    value={formData.subject}
-                    onChange={(e) => setFormData(c => ({ ...c, subject: e.target.value }))}
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
-                  >
-                    <option value="">Sélectionner un motif...</option>
-                    {MOTIFS.map(m => <option key={m} value={m}>{m}</option>)}
-                  </select>
-                </div>
-              </div>
-              {formData.subject === 'Autres' && (
-                <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-slate-700">Précisez votre motif *</label>
-                  <textarea
-                    required
-                    rows={2}
-                    value={otherSubject}
-                    onChange={(e) => setOtherSubject(e.target.value)}
-                    placeholder="Décrivez votre demande..."
-                    className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
-                  />
-                </div>
-              )}
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-semibold text-slate-700">Message *</label>
-                <textarea
-                  required
-                  name="message"
-                  rows={5}
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder="Expliquez votre besoin ou votre question..."
-                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-teal-500 focus:bg-white focus:ring-4 focus:ring-teal-500/10"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-2xl bg-slate-900 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-slate-800 disabled:opacity-60"
-              >
-                {loading ? 'Envoi en cours...' : 'Envoyer le message'}
-              </button>
             </form>
           )}
         </section>

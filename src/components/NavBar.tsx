@@ -31,8 +31,10 @@ export default function NavBar() {
   const navLinks = [
     { to: '/', label: 'Accueil' },
     { to: '/services', label: 'Soins' },
-    { to: '/contact', label: 'Contact' },
-    ...(patientUser ? [{ to: '/espace-patient', label: 'Mon espace' }] : []),
+    ...(patientUser ? [
+      { to: '/contact', label: 'Contact' },
+      { to: '/espace-patient', label: 'Mon espace' }
+    ] : []),
   ];
 
   return (
